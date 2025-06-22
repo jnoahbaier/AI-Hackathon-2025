@@ -153,6 +153,70 @@ router.get(
   }
 );
 
+// GET /api/dreams/:id/image/:scene - Find and serve image for specific dream and scene
+router.get('/:id/image/:scene', (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    const dreamId = req.params.id;
+    const sceneNumber = parseInt(req.params.scene);
+    
+    if (isNaN(sceneNumber) || sceneNumber < 1 || sceneNumber > 10) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid scene number. Must be between 1 and 10.',
+      });
+    }
+    
+    // First try to get the dream to check if it exists and has metadata
+    const dream = dreamService.getDreamById(dreamId);
+    
+    // Check if we have saved files metadata (only if dream exists)
+    if (dream && dream.comicImages && dream.comicImages.generation_metadata && dream.comicImages.generation_metadata.saved_files) {
+      const savedFile = dream.comicImages.generation_metadata.saved_files.find(
+        file => file.scene_sequence === sceneNumber
+      );
+      if (savedFile) {
+        const imagePath = path.join(__dirname, '..', 'generated_images', savedFile.filename);
+        if (fs.existsSync(imagePath)) {
+          return res.sendFile(imagePath);
+        }
+      }
+    }
+    
+    // Fallback: Search for any file matching the dream ID and scene pattern
+    const generatedImagesDir = path.join(__dirname, '..', 'generated_images');
+    if (fs.existsSync(generatedImagesDir)) {
+      const files = fs.readdirSync(generatedImagesDir);
+      
+      // Look for files that match the pattern: dream_*_scene_X.png
+      const scenePattern = new RegExp(`dream_.*_scene_${sceneNumber}\\.png$`);
+      const matchingFile = files.find(filename => scenePattern.test(filename));
+      
+      if (matchingFile) {
+        const imagePath = path.join(generatedImagesDir, matchingFile);
+        console.log(`📸 Found fallback image for dream ${dreamId} scene ${sceneNumber}: ${matchingFile}`);
+        return res.sendFile(imagePath);
+      }
+    }
+    
+    // No image found
+    res.status(404).json({
+      success: false,
+      error: `Image not found for dream ${dreamId} scene ${sceneNumber}`,
+    });
+    
+  } catch (error) {
+    console.error('❌ Image lookup error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      details: error.message,
+    });
+  }
+});
+
 // GET /api/dreams/:id - Get specific dream
 router.get('/:id', (req, res) => {
   try {

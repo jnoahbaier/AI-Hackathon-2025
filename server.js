@@ -11,7 +11,7 @@ const healthRoutes = require('./routes/health');
 const testRoutes = require('./routes/test');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet());
