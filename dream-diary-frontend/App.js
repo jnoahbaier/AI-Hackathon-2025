@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import Background from './components/Background';
 import RecordDream from './components/RecordDream';
 import RecordingView from './components/RecordingView';
-import DreamProcessingView from './components/DreamProcessingView';
+import DreamProcessingView from './components/DreamProccessingView';
 import HeaderBar from './components/HeaderBar';
 import DreamResultView from './components/DreamResultView';
 import * as FileSystem from 'expo-file-system';
@@ -13,7 +13,7 @@ import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 const BASE_URL =
-  Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+  Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3001';
 
 export default function App() {
   const [isRecording, setIsRecording] = useState(false);
@@ -146,7 +146,7 @@ export default function App() {
             let dreamId;
             try {
               const uploadRes = await axios.post(
-                '{BASE_URL}/api/dreams/upload',
+                `${BASE_URL}/api/dreams/upload`,
                 formData,
                 {
                   headers: { 'Content-Type': 'multipart/form-data' },
@@ -168,19 +168,19 @@ export default function App() {
             }
             // dreamId = '5f3a9ed2-6d29-4ffa-8c0a-a133e1c9effd';
             // Step 2: Transcribe
-            await axios.post(`{BASE_URL}/api/dreams/${dreamId}/transcribe`);
+            await axios.post(`${BASE_URL}/api/dreams/${dreamId}/transcribe`);
 
             // Step 3: Process dream
-            await axios.post(`{BASE_URL}/api/dreams/${dreamId}/process`);
+            await axios.post(`${BASE_URL}/api/dreams/${dreamId}/process`);
 
             // Step 4: Generate images
             const imageRes = await axios.post(
-              `{BASE_URL}/api/dreams/${dreamId}/generate-images`
+              `${BASE_URL}/api/dreams/${dreamId}/generate-images`
             );
             // const imageRes = await axios.get(
-            //   `{BASE_URL}/api/dreams/${dreamId}`
+            //   `${BASE_URL}/api/dreams/${dreamId}`
             // );
-
+            // console.log(imageRes.data);
             // console.log(
             //   'images',
             //   imageRes.data.dream.comicImages.generation_metadata.saved_files
