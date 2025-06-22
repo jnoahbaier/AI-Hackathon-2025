@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -17,7 +17,10 @@ export default function DreamResultView({ images }) {
   const scrollRef = useRef(null);
   const bounceAnim = useRef(new Animated.Value(0)).current;
 
-  const startBounce = () => {
+  const [aspectRatios, setAspectRatios] = useState({});
+
+  // Bounce animation for scroll hint
+  useEffect(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(bounceAnim, {
@@ -32,15 +35,30 @@ export default function DreamResultView({ images }) {
         }),
       ])
     ).start();
-  };
+  }, []);
+
+  // Load image sizes on mount
+  useEffect(() => {
+    images.forEach((img) => {
+      const uri = `${BASE_URL}/images/${img.filename}`;
+      Image.getSize(
+        uri,
+        (width, height) => {
+          setAspectRatios((prev) => ({
+            ...prev,
+            [img.filename]: width / height,
+          }));
+        },
+        (error) => {
+          console.error('Failed to get image size:', error);
+        }
+      );
+    });
+  }, [images]);
 
   const scrollToImages = () => {
     scrollRef.current?.scrollTo({ y: 300, animated: true });
   };
-
-  React.useEffect(() => {
-    startBounce();
-  }, []);
 
   return (
     <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContainer}>
@@ -61,14 +79,18 @@ export default function DreamResultView({ images }) {
       </View>
 
       <View style={styles.imagesContainer}>
-        {images.map((img, index) => (
-          <Image
-            key={index}
-            source={{ uri: `${BASE_URL}/images/${img.filename}` }}
-            style={styles.image}
-            resizeMode='contain'
-          />
-        ))}
+        {images.map((img, index) => {
+          const ratio = aspectRatios[img.filename] || 1;
+
+          return (
+            <Image
+              key={index}
+              source={{ uri: `${BASE_URL}/images/${img.filename}` }}
+              style={[styles.image, { aspectRatio: ratio }]}
+              resizeMode='contain'
+            />
+          );
+        })}
       </View>
     </ScrollView>
   );
@@ -98,7 +120,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    height: '25%',
+    height: '50%',
+    marginBottom: 20,
     borderRadius: 10,
     borderWidth: 2,
     borderColor: 'black',
