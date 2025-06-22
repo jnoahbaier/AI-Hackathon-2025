@@ -309,6 +309,7 @@ router.delete('/:id', async (req, res) => {
 router.post('/:id/transcribe', async (req, res) => {
   try {
     const dream = dreamService.getDreamById(req.params.id);
+    console.log('dream from id', dream);
     if (!dream) {
       return res.status(404).json({
         success: false,
@@ -358,7 +359,7 @@ router.post('/:id/transcribe', async (req, res) => {
     } catch (transcriptionError) {
       // Update dream status to error
       await dreamService.updateDream(req.params.id, { status: 'error' });
-
+      console.error('❌ Transcription error:', transcriptionError);
       res.status(500).json({
         success: false,
         error: 'Transcription failed',

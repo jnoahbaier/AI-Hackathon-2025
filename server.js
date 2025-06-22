@@ -24,7 +24,20 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve generated images
+// Serve generated images with CORS support
+const imagePath = path.join(__dirname, 'generated_images');
+
+app.use(
+  '/images',
+  express.static(imagePath, {
+    setHeaders: (res, path) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    },
+  })
+);
+
 app.use('/images', express.static('generated_images'));
 
 // Routes
@@ -35,17 +48,20 @@ app.use('/api/test', testRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  
+
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
       error: 'File too large',
-      message: 'Audio file size exceeds the maximum allowed limit'
+      message: 'Audio file size exceeds the maximum allowed limit',
     });
   }
-  
+
   res.status(500).json({
     error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    message:
+      process.env.NODE_ENV === 'development'
+        ? err.message
+        : 'Something went wrong',
   });
 });
 
@@ -53,7 +69,7 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     error: 'Not Found',
-    message: 'The requested resource was not found'
+    message: 'The requested resource was not found',
   });
 });
 
@@ -68,4 +84,4 @@ app.listen(PORT, () => {
   console.log(`🚀 Dream Recorder Backend running on port ${PORT}`);
   console.log(`📁 Upload directory: ${uploadDir}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-}); 
+});

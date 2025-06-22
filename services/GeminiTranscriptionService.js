@@ -73,7 +73,7 @@ class GeminiTranscriptionService {
             mimeType = 'audio/webm';
             break;
           case '.m4a':
-            mimeType = 'audio/mp4';
+            mimeType = 'audio/m4a';
             break;
           case '.ogg':
             mimeType = 'audio/ogg';

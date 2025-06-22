@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 
 class Dream {
   constructor({
+    id = uuidv4(), // ✅ preserve existing ID
     title = '',
     audioFilePath = null,
     transcription = null,
@@ -10,20 +11,20 @@ class Dream {
     tags = [],
     mood = null,
     createdAt = new Date(),
-    userId = null
+    userId = null,
   } = {}) {
-    this.id = uuidv4();
+    this.id = id;
     this.title = title;
     this.audioFilePath = audioFilePath;
     this.transcription = transcription;
-    this.processedData = processedData; // Stores summary, scenes, themes, characters from Gemini processing
-    this.comicImages = comicImages; // Array of image URLs/paths
-    this.tags = tags; // Array of strings
-    this.mood = mood; // String: happy, sad, scary, weird, etc.
-    this.createdAt = createdAt;
+    this.processedData = processedData;
+    this.comicImages = comicImages;
+    this.tags = tags;
+    this.mood = mood;
+    this.createdAt = new Date(createdAt);
     this.updatedAt = new Date();
-    this.userId = userId; // For future user authentication
-    this.status = 'uploaded'; // uploaded, transcribing, transcribed, processing, processed, generating_images, completed, error
+    this.userId = userId;
+    this.status = 'uploaded';
   }
 
   // Update dream status
@@ -79,9 +80,9 @@ class Dream {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       userId: this.userId,
-      status: this.status
+      status: this.status,
     };
   }
 }
 
-module.exports = Dream; 
+module.exports = Dream;
