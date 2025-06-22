@@ -649,10 +649,25 @@ class DreamRecorder {
             .filter(img => !img.failed)
             .map((img, index) => {
                 const sceneNumber = img.scene_sequence || index + 1;
-                const imagePath = `/images/dream_${dream.id}_scene_${sceneNumber}.png`;
+                
+                // Use the actual filename from saved_files if available
+                let imagePath = `/images/dream_${dream.id}_scene_${sceneNumber}.png`;
+                
+                // Check if generation_metadata has saved_files with the actual filename
+                if (dream.comicImages.generation_metadata && dream.comicImages.generation_metadata.saved_files) {
+                    const savedFile = dream.comicImages.generation_metadata.saved_files.find(
+                        file => file.scene_sequence === sceneNumber
+                    );
+                    if (savedFile) {
+                        imagePath = `/images/${savedFile.filename}`;
+                    }
+                }
+                
                 return `
                     <div class="journal-comic-panel">
-                        <img src="${imagePath}" alt="Scene ${sceneNumber}" onerror="this.parentElement.style.display='none'">
+                        <img src="${imagePath}" alt="Scene ${sceneNumber}" 
+                             onerror="this.onerror=null; this.src='/api/dreams/${dream.id}/image/${sceneNumber}'; console.log('Trying fallback image URL:', this.src);"
+                             onload="console.log('Image loaded successfully:', this.src);">
                         <div class="journal-panel-info">Scene ${sceneNumber}</div>
                     </div>
                 `;
@@ -673,6 +688,16 @@ class DreamRecorder {
     }
 }
 
+// Clear any existing Service Workers that might be causing issues
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+            registration.unregister();
+            console.log('🧹 Unregistered ServiceWorker:', registration.scope);
+        }
+    });
+}
+
 // Initialize the Dream Recorder when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 DOM loaded, initializing Dream Recorder...');
@@ -686,15 +711,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Service Worker for offline functionality (optional)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('SW registered: ', registration);
-            })
-            .catch(registrationError => {
-                console.log('SW registration failed: ', registrationError);
-            });
-    });
-} 
+// ServiceWorker registration removed to prevent interference 
