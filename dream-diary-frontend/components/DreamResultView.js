@@ -5,7 +5,14 @@ import {
   Animated,
   ScrollView,
   TouchableOpacity,
+  Text,
+  Image,
+  Platform,
 } from 'react-native';
+
+const BASE_URL =
+  Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3001';
+
 export default function DreamResultView({ images }) {
   const scrollRef = useRef(null);
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -57,7 +64,7 @@ export default function DreamResultView({ images }) {
         {images.map((img, index) => (
           <Image
             key={index}
-            source={{ uri: img.image_url || img.local_path || img.path }}
+            source={{ uri: `${BASE_URL}/images/${img.filename}` }}
             style={styles.image}
             resizeMode='contain'
           />
@@ -89,12 +96,11 @@ const styles = StyleSheet.create({
   imagesContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingBottom: 60,
   },
   image: {
-    width: '90%',
-    height: 250,
-    marginVertical: 20,
+    height: '25%',
     borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'black',
   },
 });

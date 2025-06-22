@@ -127,69 +127,69 @@ export default function App() {
 
           try {
             // Step 1: Upload audio
-            const formData = new FormData();
+            // const formData = new FormData();
 
-            if (Platform.OS === 'web') {
-              const blob = await fetch(uri).then((res) => res.blob());
-              formData.append(
-                'audio',
-                new File([blob], 'dream.m4a', { type: 'audio/m4a' })
-              );
-            } else {
-              formData.append('audio', {
-                uri,
-                name: 'dream.m4a',
-                type: 'audio/m4a', // Use m4a, not x-m4a
-              });
-            }
+            // if (Platform.OS === 'web') {
+            //   const blob = await fetch(uri).then((res) => res.blob());
+            //   formData.append(
+            //     'audio',
+            //     new File([blob], 'dream.m4a', { type: 'audio/m4a' })
+            //   );
+            // } else {
+            //   formData.append('audio', {
+            //     uri,
+            //     name: 'dream.m4a',
+            //     type: 'audio/m4a', // Use m4a, not x-m4a
+            //   });
+            // }
 
             let dreamId;
-            try {
-              const uploadRes = await axios.post(
-                `${BASE_URL}/api/dreams/upload`,
-                formData,
-                {
-                  headers: { 'Content-Type': 'multipart/form-data' },
-                }
-              );
+            // try {
+            //   const uploadRes = await axios.post(
+            //     '{BASE_URL}/api/dreams/upload',
+            //     formData,
+            //     {
+            //       headers: { 'Content-Type': 'multipart/form-data' },
+            //     }
+            //   );
 
-              console.log('Upload response:', uploadRes.data);
-              dreamId = uploadRes.data?.dream?.id;
-              console.log('dream:', uploadRes.data.dream);
-              if (!dreamId) {
-                throw new Error('Dream not returned from upload response');
-              }
-            } catch (uploadErr) {
-              console.error(
-                'Upload failed:',
-                uploadErr.response?.data || uploadErr.message
-              );
-              throw new Error('Dream upload failed');
-            }
-            // dreamId = '5f3a9ed2-6d29-4ffa-8c0a-a133e1c9effd';
+            //   console.log('Upload response:', uploadRes.data);
+            //   dreamId = uploadRes.data?.dream?.id;
+            //   console.log('dream:', uploadRes.data.dream);
+            //   if (!dreamId) {
+            //     throw new Error('Dream not returned from upload response');
+            //   }
+            // } catch (uploadErr) {
+            //   console.error(
+            //     'Upload failed:',
+            //     uploadErr.response?.data || uploadErr.message
+            //   );
+            //   throw new Error('Dream upload failed');
+            // }
+            dreamId = '5f3a9ed2-6d29-4ffa-8c0a-a133e1c9effd';
             // Step 2: Transcribe
-            await axios.post(`${BASE_URL}/api/dreams/${dreamId}/transcribe`);
+            // await axios.post(`${BASE_URL}/api/dreams/${dreamId}/transcribe`);
 
-            // Step 3: Process dream
-            await axios.post(`${BASE_URL}/api/dreams/${dreamId}/process`);
+            // // Step 3: Process dream
+            // await axios.post(`${BASE_URL}/api/dreams/${dreamId}/process`);
 
-            // Step 4: Generate images
-            const imageRes = await axios.post(
-              `${BASE_URL}/api/dreams/${dreamId}/generate-images`
+            // // Step 4: Generate images
+            // const imageRes = await axios.post(
+            //   `${BASE_URL}/api/dreams/${dreamId}/generate-images`
+            // );
+            const imageRes = await axios.get(
+              `${BASE_URL}/api/dreams/${dreamId}`
             );
-            // const imageRes = await axios.get(
-            //   `${BASE_URL}/api/dreams/${dreamId}`
-            // );
-            // console.log(imageRes.data);
-            // console.log(
-            //   'images',
-            //   imageRes.data.dream.comicImages.generation_metadata.saved_files
-            // );
-            // setImages(
-            //   imageRes.data.dream.comicImages.generation_metadata.saved_files
-            // );
-            console.log('images', imageRes.data.saved_files);
-            setImages(imageRes.data.saved_files);
+            console.log(imageRes.data);
+            console.log(
+              'images',
+              imageRes.data.dream.comicImages.generation_metadata.saved_files
+            );
+            setImages(
+              imageRes.data.dream.comicImages.generation_metadata.saved_files
+            );
+            // console.log('images', imageRes.data.saved_files);
+            // setImages(imageRes.data.saved_files);
             setIsProcessing(false);
             setIsComplete(true);
           } catch (apiError) {

@@ -32,13 +32,10 @@ app.use(
   express.static(imagePath, {
     setHeaders: (res, path) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Methods', 'GET');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // 🔥 REQUIRED
     },
   })
 );
-
-app.use('/images', express.static('generated_images'));
 
 // Routes
 app.use('/api/health', healthRoutes);
