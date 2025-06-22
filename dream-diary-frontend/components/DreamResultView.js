@@ -120,10 +120,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    height: '50%',
+    height: 300,
     marginBottom: 20,
-    borderRadius: 10,
-    borderWidth: 2,
+    borderRadius: 1,
+    borderWidth: 3,
     borderColor: 'black',
   },
 });

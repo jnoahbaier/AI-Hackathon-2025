@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Dimensions, Animated, Platform } from 'react-native';
+import { StyleSheet, View, Animated } from 'react-native';
+import { NativeRouter, Routes, Route } from 'react-router-native';
 import { StatusBar } from 'expo-status-bar';
-import { NativeRouter, Routes, Route, useNavigate } from 'react-router-native';
 import Background from './components/Background';
 import RecordDream from './components/RecordDream';
 import RecordingView from './components/RecordingView';
@@ -9,155 +9,7 @@ import DreamProcessingView from './components/DreamProccessingView';
 import HeaderBar from './components/HeaderBar';
 import DreamResultView from './components/DreamResultView';
 import JournalPage from './components/JournalPage';
-import * as FileSystem from 'expo-file-system';
-import { Audio } from 'expo-av';
-import axios from 'axios';
-
-const { width, height } = Dimensions.get('window');
-const BASE_URL =
-  Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3001';
-
-function HomeScreen({
-  isRecording,
-  setIsRecording,
-  isComplete,
-  setIsComplete,
-  isProcessing,
-  setIsProcessing,
-  setImages,
-  recordedAudioPath,
-  setRecordedAudioPath,
-  recordingRef,
-  swirlBlurOpacity,
-  textOpacity,
-  buttonOpacity,
-  buttonTranslateY,
-  mainUIOpacity,
-  recordingUIOpacity,
-  defaultBgOpacity,
-  recordingBgOpacity,
-  navigate,
-}) {
-  const handleRecordPress = async () => {
-    if (!isRecording) {
-      try {
-        const permission = await Audio.requestPermissionsAsync();
-        if (!permission.granted) {
-          alert('Permission to access microphone is required!');
-          return;
-        }
-
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-        );
-
-        recordingRef.current = recording;
-        setIsRecording(true);
-
-        Animated.parallel([
-          Animated.timing(defaultBgOpacity, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(recordingBgOpacity, {
-            toValue: 1,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(mainUIOpacity, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(recordingUIOpacity, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      } catch (error) {
-        console.error('Failed to start recording:', error);
-      }
-    } else {
-      try {
-        const recording = recordingRef.current;
-        await recording.stopAndUnloadAsync();
-        const uri = recording.getURI();
-        setRecordedAudioPath(uri);
-
-        Animated.parallel([
-          Animated.timing(recordingBgOpacity, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(recordingUIOpacity, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-        ]).start(async () => {
-          setIsRecording(false);
-          setIsProcessing(true);
-
-          try {
-            let dreamId = '5f3a9ed2-6d29-4ffa-8c0a-a133e1c9effd';
-            const imageRes = await axios.get(
-              `${BASE_URL}/api/dreams/${dreamId}`
-            );
-            setImages(
-              imageRes.data.dream.comicImages.generation_metadata.saved_files
-            );
-            setIsProcessing(false);
-            setIsComplete(true);
-          } catch (apiError) {
-            console.error(
-              'API error:',
-              apiError.response?.data || apiError.message || apiError
-            );
-            setIsProcessing(false);
-            alert('Something went wrong while creating your dream.');
-          }
-        });
-      } catch (error) {
-        console.error('Failed to stop recording:', error);
-      }
-    }
-  };
-
-  return (
-    <>
-      <HeaderBar
-        title='Dream Diary'
-        onLeftPress={() => navigate('/journal')}
-        onRightPress={() => navigate('/')}
-      />
-      {!isRecording && !isComplete && !isProcessing && (
-        <RecordDream
-          mainUIOpacity={mainUIOpacity}
-          textOpacity={textOpacity}
-          buttonOpacity={buttonOpacity}
-          buttonTranslateY={buttonTranslateY}
-          onPress={handleRecordPress}
-        />
-      )}
-      {isRecording && !isComplete && (
-        <RecordingView
-          recordingUIOpacity={recordingUIOpacity}
-          onPress={handleRecordPress}
-        />
-      )}
-      {isProcessing && !isComplete && <DreamProcessingView />}
-      {isComplete && <DreamResultView images={images} />}
-    </>
-  );
-}
+import HomeScreen from './components/HomeScreen';
 
 export default function App() {
   const [isRecording, setIsRecording] = useState(false);
@@ -175,8 +27,6 @@ export default function App() {
   const recordingUIOpacity = useRef(new Animated.Value(0)).current;
   const defaultBgOpacity = useRef(new Animated.Value(1)).current;
   const recordingBgOpacity = useRef(new Animated.Value(0)).current;
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     Animated.parallel([
@@ -237,7 +87,7 @@ export default function App() {
                   recordingUIOpacity,
                   defaultBgOpacity,
                   recordingBgOpacity,
-                  navigate,
+                  images,
                 }}
               />
             }
