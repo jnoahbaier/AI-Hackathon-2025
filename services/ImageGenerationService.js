@@ -173,13 +173,13 @@ class ImageGenerationService {
    */
   createStyledPrompt(basePrompt, style = "watercolor") {
     const styleMap = {
-      watercolor: `Create a dreamy watercolor-style illustration in the format of a comic panel. The scene should be surreal, soft, and slightly abstract — as if taken from a vivid dream. Use muted pastel tones and fluid brushstrokes. The composition should evoke emotion and wonder. Scene: ${basePrompt}`,
+      watercolor: `Create a dreamy watercolor-style illustration in a PERFECT SQUARE format (1024x1024 pixels, 1:1 aspect ratio). The image MUST be exactly square with equal width and height - no rectangular dimensions allowed. The scene should be surreal, soft, and slightly abstract — as if taken from a vivid dream. Use muted pastel tones and fluid brushstrokes. The composition should be perfectly centered and balanced within the square frame, filling the entire square canvas completely, evoking emotion and wonder. CRITICAL: Generate a perfectly square image only. Scene: ${basePrompt}`,
       
-      vintage: `Create a vintage comic book style illustration with soft, faded colors and gentle linework. The scene should have a nostalgic, dream-like quality with subtle textures. Scene: ${basePrompt}`,
+      vintage: `Create a vintage comic book style illustration in a PERFECT SQUARE format (1024x1024 pixels, 1:1 aspect ratio). The image MUST be exactly square with equal width and height - no rectangular dimensions allowed. The scene should have a nostalgic, dream-like quality with soft, faded colors and gentle linework. The composition should be perfectly centered within the square frame with subtle textures, filling the entire square canvas completely. CRITICAL: Generate a perfectly square image only. Scene: ${basePrompt}`,
       
-      minimal: `Create a minimalist illustration with clean lines and soft colors. The scene should be simple yet evocative, capturing the essence of a dream. Scene: ${basePrompt}`,
+      minimal: `Create a minimalist illustration in a PERFECT SQUARE format (1024x1024 pixels, 1:1 aspect ratio). The image MUST be exactly square with equal width and height - no rectangular dimensions allowed. The scene should be simple yet evocative, with clean lines and soft colors, capturing the essence of a dream within the square composition. The image should fill the entire square canvas perfectly. CRITICAL: Generate a perfectly square image only. Scene: ${basePrompt}`,
 
-      comic: `Create a comic book style illustration with vibrant colors and clear panel composition. The scene should capture the dream-like narrative with artistic flair. Scene: ${basePrompt}`
+      comic: `Create a comic book style illustration in a PERFECT SQUARE format (1024x1024 pixels, 1:1 aspect ratio). The image MUST be exactly square with equal width and height - no rectangular dimensions allowed. The scene should capture the dream-like narrative with vibrant colors and clear composition, perfectly balanced within the square frame, filling the entire square canvas completely. CRITICAL: Generate a perfectly square image only. Scene: ${basePrompt}`
     };
 
     return styleMap[style] || styleMap.watercolor;

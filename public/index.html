@@ -455,16 +455,64 @@
 
         .journal-book {
             width: 90%;
-            max-width: 1000px;
-            height: 80vh;
-            background: linear-gradient(135deg, #F4E4BC, #E6D7B7);
-            border: 8px solid #8B4513;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 1200px;
+            height: 85vh;
+            background: 
+                /* Ultra-detailed leather grain texture */
+                radial-gradient(ellipse at 8% 15%, rgba(101, 67, 33, 0.15) 1px, transparent 2px),
+                radial-gradient(ellipse at 92% 85%, rgba(139, 69, 19, 0.12) 1px, transparent 2px),
+                radial-gradient(ellipse at 25% 35%, rgba(160, 82, 45, 0.08) 2px, transparent 3px),
+                radial-gradient(ellipse at 75% 65%, rgba(139, 69, 19, 0.06) 1px, transparent 2px),
+                radial-gradient(ellipse at 45% 25%, rgba(101, 67, 33, 0.04) 1px, transparent 2px),
+                radial-gradient(ellipse at 55% 75%, rgba(160, 82, 45, 0.03) 2px, transparent 3px),
+                /* Leather creases and natural wear patterns */
+                repeating-linear-gradient(
+                    25deg,
+                    rgba(101, 67, 33, 0.04),
+                    rgba(101, 67, 33, 0.04) 1px,
+                    transparent 1px,
+                    transparent 5px
+                ),
+                repeating-linear-gradient(
+                    115deg,
+                    rgba(139, 69, 19, 0.03),
+                    rgba(139, 69, 19, 0.03) 1px,
+                    transparent 1px,
+                    transparent 7px
+                ),
+                repeating-linear-gradient(
+                    65deg,
+                    rgba(160, 82, 45, 0.02),
+                    rgba(160, 82, 45, 0.02) 1px,
+                    transparent 1px,
+                    transparent 9px
+                ),
+                /* Rich aged leather base with natural variations */
+                linear-gradient(135deg, 
+                    #D2B48C 0%, 
+                    #CD853F 15%, 
+                    #B8860B 30%, 
+                    #A0522D 45%, 
+                    #8B4513 60%, 
+                    #654321 80%, 
+                    #3E2723 100%
+                );
+            background-size: 28px 28px, 42px 42px, 65px 65px, 38px 38px, 52px 52px, 75px 75px, 14px 14px, 19px 19px, 25px 25px, 100% 100%;
+            border: 18px solid #654321;
+            border-radius: 28px;
+            box-shadow: 
+                0 35px 120px rgba(0, 0, 0, 0.8),
+                0 15px 40px rgba(101, 67, 33, 0.4),
+                inset 0 0 60px rgba(139, 69, 19, 0.25),
+                inset 0 0 120px rgba(160, 82, 45, 0.18),
+                inset 0 0 180px rgba(139, 69, 19, 0.12),
+                inset 0 2px 0 rgba(210, 180, 140, 0.3),
+                inset 0 -2px 0 rgba(101, 67, 33, 0.5);
             position: relative;
             overflow: hidden;
             transform: scale(0.8);
             transition: transform 0.3s ease;
+            perspective: 1000px;
         }
 
         .journal-modal.show .journal-book {
@@ -477,11 +525,39 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 3px;
+            width: 6px;
             height: 100%;
-            background: #8B4513;
-            box-shadow: 2px 0 0 #654321, -2px 0 0 #654321;
-            z-index: 1;
+            background: linear-gradient(to right, 
+                #654321, 
+                #8B4513, 
+                #A0522D, 
+                #8B4513, 
+                #654321
+            );
+            box-shadow: 
+                2px 0 0 #654321, 
+                -2px 0 0 #654321,
+                0 0 10px rgba(139, 69, 19, 0.3);
+            z-index: 10;
+        }
+
+        /* Add book spine texture */
+        .journal-book::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 70%;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(139, 69, 19, 0.1),
+                rgba(139, 69, 19, 0.1) 2px,
+                transparent 2px,
+                transparent 8px
+            );
+            z-index: 9;
         }
 
         .journal-header {
@@ -491,6 +567,7 @@
             text-align: center;
             border-bottom: 3px solid #654321;
             position: relative;
+            z-index: 15;
         }
 
         .journal-title {
@@ -515,6 +592,7 @@
             font-size: 2rem;
             cursor: pointer;
             transition: transform 0.2s ease;
+            z-index: 20;
         }
 
         .journal-close:hover {
@@ -523,22 +601,376 @@
 
         .journal-content {
             height: calc(100% - 80px);
-            overflow-y: auto;
-            padding: 30px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="30"><line x1="0" y1="25" x2="100" y2="25" stroke="%23D4C4A8" stroke-width="1" opacity="0.3"/></svg>') repeat-y;
+            position: relative;
+            overflow: hidden;
         }
 
-        .journal-loading {
+        /* Book Pages */
+        .book-pages {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .book-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                /* Ultra-realistic paper texture with natural fibers */
+                radial-gradient(ellipse at 12% 18%, rgba(139, 69, 19, 0.06) 1px, transparent 2px),
+                radial-gradient(ellipse at 88% 82%, rgba(160, 82, 45, 0.04) 1px, transparent 2px),
+                radial-gradient(ellipse at 28% 55%, rgba(139, 69, 19, 0.03) 2px, transparent 3px),
+                radial-gradient(ellipse at 72% 35%, rgba(160, 82, 45, 0.025) 1px, transparent 2px),
+                radial-gradient(ellipse at 18% 78%, rgba(139, 69, 19, 0.02) 1px, transparent 2px),
+                radial-gradient(ellipse at 82% 22%, rgba(160, 82, 45, 0.015) 1px, transparent 2px),
+                radial-gradient(ellipse at 45% 65%, rgba(139, 69, 19, 0.01) 2px, transparent 3px),
+                /* Fine paper grain with cross-hatching */
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(139, 69, 19, 0.012),
+                    rgba(139, 69, 19, 0.012) 1px,
+                    transparent 1px,
+                    transparent 3px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(160, 82, 45, 0.008),
+                    rgba(160, 82, 45, 0.008) 1px,
+                    transparent 1px,
+                    transparent 5px
+                ),
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(139, 69, 19, 0.004),
+                    rgba(139, 69, 19, 0.004) 1px,
+                    transparent 1px,
+                    transparent 8px
+                ),
+                /* Elegant ruled lines for writing */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 26px,
+                    rgba(139, 69, 19, 0.08) 27px,
+                    rgba(139, 69, 19, 0.08) 28px,
+                    transparent 29px
+                ),
+                /* Natural paper aging and foxing stains */
+                radial-gradient(ellipse at 5% 8%, rgba(160, 82, 45, 0.04) 20px, transparent 35px),
+                radial-gradient(ellipse at 95% 92%, rgba(139, 69, 19, 0.035) 18px, transparent 30px),
+                radial-gradient(ellipse at 15% 88%, rgba(160, 82, 45, 0.025) 12px, transparent 22px),
+                radial-gradient(ellipse at 85% 12%, rgba(139, 69, 19, 0.02) 15px, transparent 28px),
+                radial-gradient(ellipse at 35% 25%, rgba(160, 82, 45, 0.015) 8px, transparent 18px),
+                /* Premium aged paper base with subtle variations */
+                linear-gradient(135deg, 
+                    #FFFEF7 0%, 
+                    #FAF9F2 20%, 
+                    #F6F5EE 40%, 
+                    #F2F1EA 60%, 
+                    #EEEAE6 80%, 
+                    #EAE6E2 100%
+                );
+            background-size: 22px 22px, 38px 38px, 58px 58px, 32px 32px, 48px 48px, 65px 65px, 75px 75px, 12px 12px, 16px 16px, 28px 28px, 100% 100%, 140px 140px, 110px 110px, 85px 85px, 95px 95px, 120px 120px, 100% 100%;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 
+                inset 0 0 50px rgba(139, 69, 19, 0.18),
+                inset 0 0 100px rgba(139, 69, 19, 0.12),
+                inset 0 0 150px rgba(160, 82, 45, 0.08),
+                inset 0 2px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -1px 0 rgba(139, 69, 19, 0.1),
+                0 0 20px rgba(139, 69, 19, 0.05);
+            transform-origin: left center;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backface-visibility: hidden;
+            overflow-y: auto;
+            padding: 45px;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        .book-page.active {
+            display: block;
+            z-index: 2;
+        }
+
+        .book-page.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        .book-page.flipping {
+            z-index: 5;
+            animation: pageFlip 0.6s ease-in-out;
+        }
+
+        @keyframes pageFlip {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(-90deg) scale(0.95); }
+            100% { transform: rotateY(-180deg); }
+        }
+
+        /* Page content */
+        .page-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
             text-align: center;
-            padding: 50px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #D4C4A8;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: #8B4513;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-family: 'Georgia', serif;
+        }
+
+        .page-date {
+            color: #A0522D;
+            font-size: 1rem;
+            font-style: italic;
+        }
+
+        .page-summary {
+            background: 
+                /* Ink blot texture */
+                radial-gradient(ellipse at 15% 25%, rgba(167, 139, 250, 0.1) 3px, transparent 4px),
+                radial-gradient(ellipse at 85% 75%, rgba(167, 139, 250, 0.08) 2px, transparent 3px),
+                radial-gradient(ellipse at 50% 50%, rgba(167, 139, 250, 0.06) 1px, transparent 2px),
+                /* Paper texture */
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(167, 139, 250, 0.02),
+                    rgba(167, 139, 250, 0.02) 1px,
+                    transparent 1px,
+                    transparent 4px
+                ),
+                rgba(167, 139, 250, 0.15);
+            background-size: 60px 60px, 40px 40px, 80px 80px, 20px 20px, 100% 100%;
+            border-left: 5px solid #A78BFA;
+            padding: 18px;
+            margin-bottom: 28px;
+            border-radius: 0 10px 10px 0;
+            font-style: italic;
+            color: #4C1D95;
+            line-height: 1.7;
+            box-shadow: 
+                inset 0 0 15px rgba(167, 139, 250, 0.08),
+                0 2px 8px rgba(167, 139, 250, 0.1);
+        }
+
+        .dream-scenes {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            align-content: start;
+            max-height: calc(100% - 120px);
+            overflow-y: auto;
+        }
+
+        .scene-panel {
+            background: 
+                /* Detailed paper texture for panels */
+                radial-gradient(ellipse at 20% 30%, rgba(139, 69, 19, 0.025) 1px, transparent 2px),
+                radial-gradient(ellipse at 80% 70%, rgba(160, 82, 45, 0.02) 1px, transparent 2px),
+                radial-gradient(ellipse at 45% 15%, rgba(139, 69, 19, 0.015) 2px, transparent 3px),
+                radial-gradient(ellipse at 65% 85%, rgba(160, 82, 45, 0.01) 1px, transparent 2px),
+                /* Fine paper grain */
+                repeating-linear-gradient(
+                    30deg,
+                    rgba(139, 69, 19, 0.008),
+                    rgba(139, 69, 19, 0.008) 1px,
+                    transparent 1px,
+                    transparent 4px
+                ),
+                repeating-linear-gradient(
+                    120deg,
+                    rgba(160, 82, 45, 0.006),
+                    rgba(160, 82, 45, 0.006) 1px,
+                    transparent 1px,
+                    transparent 5px
+                ),
+                /* Subtle aging */
+                radial-gradient(ellipse at 5% 5%, rgba(160, 82, 45, 0.015) 10px, transparent 20px),
+                radial-gradient(ellipse at 95% 95%, rgba(139, 69, 19, 0.01) 8px, transparent 15px),
+                /* Clean paper base */
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.99) 0%, 
+                    rgba(249, 248, 241, 0.98) 50%, 
+                    rgba(245, 243, 237, 0.97) 100%
+                );
+            background-size: 20px 20px, 30px 30px, 40px 40px, 25px 25px, 12px 12px, 16px 16px, 60px 60px, 50px 50px, 100% 100%;
+            border: 3px solid #D4C4A8;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 
+                0 4px 15px rgba(139, 69, 19, 0.18),
+                inset 0 0 20px rgba(139, 69, 19, 0.04),
+                inset 0 2px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -1px 0 rgba(139, 69, 19, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scene-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+        }
+
+        .scene-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            border: 5px solid #D4C4A8;
+            box-shadow: 
+                0 6px 20px rgba(139, 69, 19, 0.3),
+                inset 0 0 0 4px rgba(255, 255, 255, 0.8),
+                inset 0 0 0 5px rgba(139, 69, 19, 0.12),
+                0 0 0 2px rgba(139, 69, 19, 0.18),
+                0 2px 8px rgba(160, 82, 45, 0.15);
+            aspect-ratio: 1 / 1; /* Ensure perfect square aspect ratio - critical for display */
+            transition: all 0.3s ease;
+            position: relative;
+            /* Force square dimensions */
+            min-height: 140px;
+            max-height: 140px;
+        }
+        
+        /* Enhanced paper texture overlay on images for vintage book feel */
+        .scene-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                /* Fine paper grain over images */
+                radial-gradient(ellipse at 20% 30%, rgba(255, 255, 255, 0.15) 1px, transparent 2px),
+                radial-gradient(ellipse at 80% 70%, rgba(139, 69, 19, 0.03) 1px, transparent 2px),
+                radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.08) 1px, transparent 2px),
+                radial-gradient(ellipse at 30% 80%, rgba(160, 82, 45, 0.02) 1px, transparent 2px),
+                /* Subtle aging effect */
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.1) 0%, 
+                    transparent 50%, 
+                    rgba(139, 69, 19, 0.02) 100%
+                );
+            background-size: 18px 18px, 25px 25px, 35px 35px, 40px 40px, 100% 100%;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        
+        .scene-image:hover {
+            transform: scale(1.04);
+            box-shadow: 
+                0 10px 25px rgba(139, 69, 19, 0.35),
+                inset 0 0 0 4px rgba(255, 255, 255, 0.9),
+                inset 0 0 0 5px rgba(139, 69, 19, 0.18),
+                0 0 0 2px rgba(139, 69, 19, 0.25),
+                0 4px 12px rgba(160, 82, 45, 0.2);
+        }
+
+        .scene-caption {
+            font-size: 0.8rem;
+            color: #5D4E37;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            font-family: 'Georgia', serif;
+        }
+
+        .scene-emotion {
+            display: inline-block;
+            background: linear-gradient(135deg, #A0522D, #8B4513);
+            color: #F4E4BC;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-transform: capitalize;
+            float: right;
+        }
+
+        /* Navigation */
+        .page-navigation {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #F4E4BC;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #8B4513;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Empty states */
+        .journal-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
             color: #8B4513;
             font-size: 1.2rem;
         }
 
         .journal-empty {
-            text-align: center;
-            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
             color: #8B4513;
+            text-align: center;
         }
 
         .journal-empty-icon {
@@ -546,83 +978,7 @@
             margin-bottom: 20px;
         }
 
-        .dream-entry {
-            background: rgba(255, 255, 255, 0.7);
-            border: 2px solid #D4C4A8;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .dream-entry:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .dream-entry-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #E6D7B7;
-        }
-
-        .dream-title {
-            font-size: 1.3rem;
-            color: #8B4513;
-            font-weight: bold;
-        }
-
-        .dream-date {
-            color: #A0522D;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
-        .dream-summary-text {
-            color: #654321;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-
-        .dream-comics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .journal-comic-panel {
-            background: white;
-            border: 2px solid #8B4513;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease;
-        }
-
-        .journal-comic-panel:hover {
-            transform: scale(1.05);
-        }
-
-        .journal-comic-panel img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .journal-panel-info {
-            font-size: 0.8rem;
-            color: #8B4513;
-            text-align: center;
-        }
-
+        /* Responsive design */
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -666,8 +1022,30 @@
                 height: 90vh;
             }
 
-            .dream-comics {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            .book-page {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .dream-scenes {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .scene-image {
+                height: 120px;
+            }
+
+            .scene-caption {
+                font-size: 0.75rem;
+            }
+
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -776,10 +1154,19 @@
                 <div class="journal-title">📚 Dream Journal</div>
                 <div class="journal-subtitle">Your collection of dreams and their stories</div>
             </div>
-            <div class="journal-content" id="journalContent">
-                <div class="journal-loading">
-                    <div class="loading"></div>
-                    <div>Loading your dreams...</div>
+            <div class="journal-content">
+                <div class="book-pages" id="bookPages">
+                    <div class="journal-loading">
+                        <div class="loading"></div>
+                        <div>Loading your dreams...</div>
+                    </div>
+                </div>
+                <div class="page-navigation" id="pageNavigation" style="display: none;">
+                    <button class="nav-button" id="prevPageBtn">← Previous</button>
+                    <button class="nav-button" id="nextPageBtn">Next →</button>
+                </div>
+                <div class="page-indicator" id="pageIndicator" style="display: none;">
+                    Page 1 of 1
                 </div>
             </div>
         </div>

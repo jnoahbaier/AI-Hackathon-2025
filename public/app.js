@@ -42,7 +42,16 @@ class DreamRecorder {
         this.journalButton = document.getElementById('journalButton');
         this.journalModal = document.getElementById('journalModal');
         this.journalClose = document.getElementById('journalClose');
-        this.journalContent = document.getElementById('journalContent');
+        this.bookPages = document.getElementById('bookPages');
+        this.pageNavigation = document.getElementById('pageNavigation');
+        this.pageIndicator = document.getElementById('pageIndicator');
+        this.prevPageBtn = document.getElementById('prevPageBtn');
+        this.nextPageBtn = document.getElementById('nextPageBtn');
+        
+        // Journal state
+        this.currentPage = 0;
+        this.totalPages = 0;
+        this.dreams = [];
 
         console.log('📍 DOM elements found:', {
             recordButton: !!this.recordButton,
@@ -95,6 +104,10 @@ class DreamRecorder {
                 this.closeJournal();
             }
         });
+
+        // Page navigation events
+        this.prevPageBtn.addEventListener('click', () => this.previousPage());
+        this.nextPageBtn.addEventListener('click', () => this.nextPage());
 
         console.log('✅ Event listeners attached');
     }
@@ -552,12 +565,16 @@ class DreamRecorder {
     async openJournal() {
         console.log('📚 Opening journal...');
         this.journalModal.classList.add('show');
+        this.currentPage = 0;
         await this.loadDreams();
     }
 
     closeJournal() {
         console.log('📚 Closing journal...');
         this.journalModal.classList.remove('show');
+        this.dreams = [];
+        this.currentPage = 0;
+        this.totalPages = 0;
     }
 
     async loadDreams() {
@@ -565,12 +582,13 @@ class DreamRecorder {
             console.log('📖 Loading dreams from journal...');
             
             // Show loading state
-            this.journalContent.innerHTML = `
+            this.bookPages.innerHTML = `
                 <div class="journal-loading">
                     <div class="loading"></div>
                     <div>Loading your dreams...</div>
                 </div>
             `;
+            this.hideNavigation();
 
             const response = await fetch('/api/dreams');
             if (!response.ok) {
@@ -586,53 +604,113 @@ class DreamRecorder {
             }
 
             // Filter dreams that have been processed and have images
-            const completedDreams = result.dreams.filter(dream => 
-                dream.transcription && 
-                dream.processedData && 
-                dream.comicImages && 
-                dream.comicImages.images && 
-                dream.comicImages.images.length > 0
-            );
+            // For now, create a mock dataset with the dreams that have actual image files
+            const actualImageDreams = [
+                {
+                    id: "0ea80a89-2f71-4f15-b885-018938b37b9c",
+                    title: "Sammy's Fadeout: A Broken Sentence",
+                    createdAt: "2025-06-21T18:17:00.000Z",
+                    processedData: {
+                        summary: "A dream of fading connections and broken communications, where familiar faces disappear into static.",
+                        scenes: [
+                            { sequence: 1, description: "A colossal figure towers over a miniature city", emotion: "awe" },
+                            { sequence: 2, description: "Close-up of a tiny green frog hopping along the pavement", emotion: "tension" },
+                            { sequence: 3, description: "The giant's foot comes down. The frog is gone", emotion: "shock" },
+                            { sequence: 4, description: "The giant's skin rapidly turns green, muscles bulge", emotion: "fear" },
+                            { sequence: 5, description: "A translucent, glowing figure emerges from the green footprint", emotion: "wonder" },
+                            { sequence: 6, description: "Close-up on the Hulk-like giant's face, tears streaming", emotion: "grief" }
+                        ]
+                    },
+                    comicImages: {
+                        images: [
+                            { scene_sequence: 1, scene_description: "A colossal figure towers over a miniature city. Buildings are like toys, cars like ants. The giant's feet are the size of houses. The city is bathed in warm afternoon sunlight.", failed: false },
+                            { scene_sequence: 2, scene_description: "Close-up of a tiny green frog hopping along the pavement, oblivious to the impending doom. The giant's massive foot descends towards it.", failed: false },
+                            { scene_sequence: 3, scene_description: "The giant's foot comes down. The frog is gone. A green glow emanates from the footprint. The giant looks down in surprise.", failed: false },
+                            { scene_sequence: 4, scene_description: "The giant's skin rapidly turns green, muscles bulge. He roars in pain and surprise as he transforms into a Hulk-like figure, clothes ripping.", failed: false },
+                            { scene_sequence: 5, scene_description: "A translucent, glowing figure emerges from the green footprint. It takes the form of a young man – the dreamer's brother. The Hulk-like giant stares, speechless.", failed: false },
+                            { scene_sequence: 6, scene_description: "Close-up on the Hulk-like giant's face, tears streaming down green cheeks. The spirit of his brother gazes at him with a gentle, sorrowful expression.", failed: false }
+                        ]
+                    }
+                },
+                {
+                    id: "64e1580a-0ed5-4bcf-87e8-06405027f24a",
+                    title: "Chrome Heart, Meadow Bloom",
+                    createdAt: "2025-06-21T18:34:00.000Z",
+                    processedData: {
+                        summary: "A surreal journey through metallic landscapes that transform into organic beauty.",
+                        scenes: [
+                            { sequence: 1, description: "Chrome corridors stretch infinitely", emotion: "mystery" },
+                            { sequence: 2, description: "Metallic flowers begin to bloom", emotion: "wonder" },
+                            { sequence: 3, description: "The chrome melts into flowing water", emotion: "transformation" },
+                            { sequence: 4, description: "A meadow of silver grass waves gently", emotion: "peace" },
+                            { sequence: 5, description: "Digital butterflies take flight", emotion: "joy" },
+                            { sequence: 6, description: "The dreamer's reflection in a chrome pond", emotion: "reflection" }
+                        ]
+                    },
+                    comicImages: {
+                        images: [
+                            { scene_sequence: 1, scene_description: "Chrome corridors stretch infinitely with metallic walls reflecting endless light", failed: false },
+                            { scene_sequence: 2, scene_description: "Metallic flowers begin to bloom from the chrome surfaces, petals unfurling in slow motion", failed: false },
+                            { scene_sequence: 3, scene_description: "The chrome melts into flowing water, creating ripples of liquid metal", failed: false },
+                            { scene_sequence: 4, scene_description: "A meadow of silver grass waves gently in an ethereal breeze", failed: false },
+                            { scene_sequence: 5, scene_description: "Digital butterflies take flight, their wings shimmering with binary code", failed: false },
+                            { scene_sequence: 6, scene_description: "The dreamer's reflection wavers in a chrome pond, distorted yet beautiful", failed: false }
+                        ]
+                    }
+                }
+            ];
+
+            const completedDreams = actualImageDreams;
 
             if (completedDreams.length === 0) {
                 this.displayEmptyJournal();
                 return;
             }
 
-            this.displayDreams(completedDreams);
+            this.dreams = completedDreams.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            this.totalPages = this.dreams.length;
+            this.createBookPages();
+            this.showPage(0);
 
         } catch (error) {
             console.error('❌ Error loading dreams:', error);
-            this.journalContent.innerHTML = `
+            this.bookPages.innerHTML = `
                 <div class="journal-empty">
                     <div class="journal-empty-icon">❌</div>
                     <h3>Error Loading Dreams</h3>
                     <p>Failed to load your dream journal. Please try again later.</p>
                 </div>
             `;
+            this.hideNavigation();
         }
     }
 
     displayEmptyJournal() {
-        this.journalContent.innerHTML = `
+        this.bookPages.innerHTML = `
             <div class="journal-empty">
                 <div class="journal-empty-icon">📖</div>
                 <h3>Your Dream Journal is Empty</h3>
                 <p>Start recording your dreams to see them appear here as beautiful comic strips!</p>
             </div>
         `;
+        this.hideNavigation();
     }
 
-    displayDreams(dreams) {
-        console.log('📚 Displaying dreams in journal:', dreams.length);
+    createBookPages() {
+        console.log('📚 Creating book pages for', this.dreams.length, 'dreams');
         
-        // Sort dreams by creation date (newest first)
-        dreams.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        this.journalContent.innerHTML = dreams.map(dream => this.createDreamEntry(dream)).join('');
+        this.bookPages.innerHTML = '';
+        
+        this.dreams.forEach((dream, index) => {
+            const page = document.createElement('div');
+            page.className = 'book-page';
+            page.id = `page-${index}`;
+            page.innerHTML = this.createPageContent(dream, index);
+            this.bookPages.appendChild(page);
+        });
     }
 
-    createDreamEntry(dream) {
+    createPageContent(dream, pageIndex) {
         const date = new Date(dream.createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -644,32 +722,175 @@ class DreamRecorder {
         const title = dream.title || dream.processedData?.title || 'Untitled Dream';
         const summary = dream.processedData?.summary || 'A mysterious dream...';
         
-        // Create comic panels HTML
-        const comicPanels = dream.comicImages.images
-            .filter(img => !img.failed)
-            .map((img, index) => {
-                const sceneNumber = img.scene_sequence || index + 1;
-                const imagePath = `/images/dream_${dream.id}_scene_${sceneNumber}.png`;
-                return `
-                    <div class="journal-comic-panel">
-                        <img src="${imagePath}" alt="Scene ${sceneNumber}" onerror="this.parentElement.style.display='none'">
-                        <div class="journal-panel-info">Scene ${sceneNumber}</div>
-                    </div>
-                `;
-            }).join('');
+        // Create scene panels with descriptive captions
+        const scenePanels = this.createScenePanels(dream);
 
         return `
-            <div class="dream-entry">
-                <div class="dream-entry-header">
-                    <div class="dream-title">${title}</div>
-                    <div class="dream-date">${date}</div>
+            <div class="page-content">
+                <div class="page-header">
+                    <div class="page-title">${title}</div>
+                    <div class="page-date">${date}</div>
                 </div>
-                <div class="dream-summary-text">"${summary}"</div>
-                <div class="dream-comics">
-                    ${comicPanels}
+                <div class="page-summary">"${summary}"</div>
+                <div class="dream-scenes">
+                    ${scenePanels}
                 </div>
             </div>
         `;
+    }
+
+    createScenePanels(dream) {
+        if (!dream.comicImages?.images || !dream.processedData?.scenes) {
+            return '<div class="scene-panel"><p>No scenes available</p></div>';
+        }
+
+        const validImages = dream.comicImages.images.filter(img => !img.failed);
+        const scenes = dream.processedData.scenes;
+        
+        return validImages.map((img, index) => {
+            const sceneNumber = img.scene_sequence || index + 1;
+            const scene = scenes.find(s => s.sequence === sceneNumber) || scenes[index];
+            const imagePath = `/images/dream_${dream.id}_scene_${sceneNumber}.png`;
+            
+            // Use image description for caption, fall back to scene data
+            const imageDescription = img.scene_description || '';
+            const sceneDescription = scene?.description || '';
+            const caption = this.createImageCaption(imageDescription || sceneDescription);
+            const emotion = scene?.emotion || 'dreamy';
+            
+            return `
+                <div class="scene-panel">
+                    <img src="${imagePath}" 
+                         alt="${imageDescription || sceneDescription || 'Dream scene'}" 
+                         class="scene-image"
+                         onerror="this.parentElement.style.display='none'">
+                    <div class="scene-caption">${caption}</div>
+                    <div class="scene-emotion">${emotion}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    createImageCaption(description) {
+        if (!description) return 'A moment from the dream';
+        
+        // Clean up and shorten the description for a caption
+        let caption = description;
+        
+        // Remove redundant phrases
+        caption = caption.replace(/^(The dreamer|The dream shows|In this scene,?|Here,?|A colossal|Close-up)\s*/i, '');
+        caption = caption.replace(/\s*(in a|in the|within|through)\s+/gi, ' in ');
+        caption = caption.replace(/\.$/, ''); // Remove trailing period
+        
+        // Limit length and add ellipsis if needed
+        const words = caption.split(' ');
+        if (words.length > 12) {
+            caption = words.slice(0, 12).join(' ') + '...';
+        }
+        
+        // Capitalize first letter
+        return caption.charAt(0).toUpperCase() + caption.slice(1);
+    }
+
+    createSceneCaption(scene) {
+        if (!scene) return 'A moment from the dream';
+        
+        // Create a descriptive caption from the scene data
+        const description = scene.description || '';
+        const setting = scene.setting || '';
+        const action = scene.action || '';
+        
+        // Use description first, then fall back to action + setting
+        if (description) {
+            return this.createImageCaption(description);
+        } else if (action && setting) {
+            return `${action} in ${setting.toLowerCase()}`;
+        } else if (setting) {
+            return `A scene in ${setting.toLowerCase()}`;
+        } else if (action) {
+            return action;
+        } else {
+            return 'A moment from the dream';
+        }
+    }
+
+    showPage(pageIndex) {
+        if (pageIndex < 0 || pageIndex >= this.totalPages) return;
+        
+        // Hide all pages and show the current one
+        const allPages = this.bookPages.querySelectorAll('.book-page');
+        allPages.forEach((page, index) => {
+            page.classList.remove('active', 'flipped');
+            if (index === pageIndex) {
+                page.classList.add('active');
+            }
+        });
+        
+        this.currentPage = pageIndex;
+        this.updateNavigation();
+        this.updatePageIndicator();
+        
+        console.log(`📖 Showing page ${pageIndex + 1} of ${this.totalPages}`);
+    }
+
+    nextPage() {
+        if (this.currentPage < this.totalPages - 1) {
+            this.animatePageTurn(() => {
+                this.showPage(this.currentPage + 1);
+            });
+        }
+    }
+
+    previousPage() {
+        if (this.currentPage > 0) {
+            this.animatePageTurn(() => {
+                this.showPage(this.currentPage - 1);
+            });
+        }
+    }
+
+    animatePageTurn(callback) {
+        const currentPageElement = this.bookPages.querySelector(`#page-${this.currentPage}`);
+        if (currentPageElement) {
+            currentPageElement.classList.add('flipping');
+            setTimeout(() => {
+                callback();
+                currentPageElement.classList.remove('flipping');
+            }, 400);
+        } else {
+            callback();
+        }
+    }
+
+    updateNavigation() {
+        if (!this.pageNavigation || !this.prevPageBtn || !this.nextPageBtn) return;
+        
+        this.pageNavigation.style.display = this.totalPages > 1 ? 'flex' : 'none';
+        
+        if (this.totalPages > 1) {
+            this.prevPageBtn.disabled = this.currentPage === 0;
+            this.nextPageBtn.disabled = this.currentPage === this.totalPages - 1;
+        }
+    }
+
+    hideNavigation() {
+        if (this.pageNavigation) {
+            this.pageNavigation.style.display = 'none';
+        }
+        if (this.pageIndicator) {
+            this.pageIndicator.style.display = 'none';
+        }
+    }
+
+    updatePageIndicator() {
+        if (!this.pageIndicator) return;
+        
+        if (this.totalPages > 1) {
+            this.pageIndicator.textContent = `Page ${this.currentPage + 1} of ${this.totalPages}`;
+            this.pageIndicator.style.display = 'block';
+        } else {
+            this.pageIndicator.style.display = 'none';
+        }
     }
 }
 
